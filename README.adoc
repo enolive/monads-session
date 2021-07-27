@@ -1,0 +1,12 @@
+= Monads for developers
+
+This repo contains the demo code for my session about monads and why they are useful for developers, not only
+mathematicians. The idea of the demo is how to write an expression parser with very expressive error handling
+the easy way.
+
+== Structure
+
+There are two subfolders here, which implement the same parser
+
+- Kotlin as a main stream language using the popular FP companion library, https://arrow-kt.io[Arrow-Kt]
+- Haskell as a nice, but rather niche language using its innate powers
