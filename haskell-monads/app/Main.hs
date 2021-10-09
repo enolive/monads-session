@@ -9,7 +9,7 @@ data Expression
 
 data DivisionByZero = DivisionByZero
 
-instance Show DivisionByZero where 
+instance Show DivisionByZero where
   show _ = "Division by zero"
 
 -- Haskell already defines a generic monad with unit (called return in Haskell) and bind (the strange >>= operator)
@@ -21,6 +21,7 @@ eval (Div a b) = do
   x <- eval a
   y <- eval b
   x `safeDiv` y
+
 -- Monadic bind alternative to the code above
 --eval (Div a b) =
 --  eval a >>= (\x -> eval b >>= (\y -> x `safeDiv` y))
@@ -30,7 +31,7 @@ safeDiv _ 0 = Left DivisionByZero
 safeDiv x y = return $ x `div` y
 
 -- List monad
--- unlike in Kotlin, it is possible to use a monadic comprehension for non-deterministic 
+-- unlike in Kotlin, it is possible to use a monadic comprehension for non-deterministic
 -- structures such as lists and sequences as well
 cartesian :: [a] -> [b] -> [(a, b)]
 --cartesian xs ys = xs >>= (\x -> ys >>= (\y -> return (x, y)))
@@ -46,4 +47,3 @@ main = do
   let err = Div (Const 1) (Const 0)
   let complexError = Div answer err
   forM_ (eval <$> [answer, err, complexError]) print
-  
