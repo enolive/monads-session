@@ -1,5 +1,4 @@
 import arrow.core.Either
-import arrow.core.computations.either
 import arrow.core.flatMap
 import arrow.core.right
 
@@ -15,22 +14,17 @@ private val answer = Div(Div(Const(1932), Const(23)), Const(2))
 private val err = Div(Const(1), Const(0))
 private val complexErr = Div(answer, err)
 
-// monadic comprehensions with the power of Arrow-Kt
-private suspend fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
+private fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
   is Const -> e.num.unit()
-  is Div   ->
-    either {
-      val x = eval(e.a).bind()
-      val y = eval(e.b).bind()
-      (x safeDiv y).bind()
+  is Div ->
+    eval(e.a).bind { x ->
+      eval(e.b).bind { y ->
+        x safeDiv y
+      }
     }
-  // monadic bind -- need to remove the suspend keyword to make it work!
-  //  eval(e.a).bind { x ->
-  //  eval(e.b).bind { y ->
-  //  x safeDiv y
-  //  }
-  //  }
 }
+
+private infix fun Int.safeDiv(that: Int) = Either.catch({ DivByZeroError }) { this / that }
 
 // a monad is a structure that implements both unit and bind!
 // unfortunately, there is no way in Kotlin's type system to define a generic monad because it lacks the
@@ -44,9 +38,7 @@ private fun <T> T.unit() = right()
 // bind :: (Monad<T>, (T) -> Monad<U>) -> Monad<U>
 private fun <T, U, E> Either<E, T>.bind(f: (T) -> Either<E, U>) = flatMap(f)
 
-private infix fun Int.safeDiv(that: Int) = Either.catch({ DivByZeroError }) { this / that }
-
-suspend fun main() {
+fun main() {
   listOf(
     answer,
     err,
