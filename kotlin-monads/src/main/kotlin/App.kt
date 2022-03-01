@@ -1,5 +1,6 @@
 import arrow.core.Either
 import arrow.core.flatMap
+import arrow.core.left
 import arrow.core.right
 
 private sealed interface Expression
@@ -16,15 +17,17 @@ private val complexErr = Div(answer, err)
 
 private fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
   is Const -> e.num.unit()
-  is Div ->
-    eval(e.a).bind { x ->
-      eval(e.b).bind { y ->
-        x safeDiv y
-      }
+  is Div   -> eval(e.a).bind { x ->
+    eval(e.b).bind { y ->
+      x safeDiv y
     }
+  }
 }
 
-private infix fun Int.safeDiv(that: Int) = Either.catch({ DivByZeroError }) { this / that }
+private infix fun Int.safeDiv(that: Int) = when (that) {
+  0    -> DivByZeroError.left()
+  else -> (this / that).unit()
+}
 
 // a monad is a structure that implements both unit and bind!
 // unfortunately, there is no way in Kotlin's type system to define a generic monad because it lacks the
