@@ -1,52 +1,23 @@
-import arrow.core.Either
-import arrow.core.computations.either
-import arrow.core.flatMap
-import arrow.core.right
-
 private sealed interface Expression
 private data class Const(val num: Int) : Expression
 private data class Div(val a: Expression, val b: Expression) : Expression
-
-private object DivByZeroError {
-  override fun toString() = "/ by zero"
-}
 
 private val answer = Div(Div(Const(1932), Const(23)), Const(2))
 private val err = Div(Const(1), Const(0))
 private val complexErr = Div(answer, err)
 
-// monadic comprehensions with the power of Arrow-Kt
-private suspend fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
-  is Const -> e.num.unit()
-  is Div   ->
-    either {
-      val x = eval(e.a).bind()
-      val y = eval(e.b).bind()
-      (x safeDiv y).bind()
-    }
-  // monadic bind -- need to remove the suspend keyword to make it work!
-  //  eval(e.a).bind { x ->
-  //  eval(e.b).bind { y ->
-  //  x safeDiv y
-  //  }
-  //  }
+// this type signature is a lie as it promises that any expression can be converted to an int, which is
+// obviously not true due to division by zero errors
+private fun eval(e: Expression): Int = when (e) {
+  is Const -> e.num
+  is Div -> {
+    val x = eval(e.a)
+    val y = eval(e.b)
+    x / y
+  }
 }
 
-// a monad is a structure that implements both unit and bind!
-// unfortunately, there is no way in Kotlin's type system to define a generic monad because it lacks the
-// syntax to enforce type constructors such as unit and higher kinded types
-// (something like a generic type with another generic type embedded, such as M<T>)
-// the only 3 languages I am aware of where something like this would be possible are Scala, C++ Templates and Haskell
-
-// unit :: (T) -> Monad<T>
-private fun <T> T.unit() = right()
-
-// bind :: (Monad<T>, (T) -> Monad<U>) -> Monad<U>
-private fun <T, U, E> Either<E, T>.bind(f: (T) -> Either<E, U>) = flatMap(f)
-
-private infix fun Int.safeDiv(that: Int) = Either.catch({ DivByZeroError }) { this / that }
-
-suspend fun main() {
+fun main() {
   listOf(
     answer,
     err,
