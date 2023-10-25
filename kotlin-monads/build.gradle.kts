@@ -4,7 +4,7 @@ val arrow_version: String by project
 val coroutines_version: String by project
 
 plugins {
-  kotlin("jvm") version "1.7.20"
+  kotlin("jvm") version "1.9.10"
 }
 
 group = "de.welcz"
@@ -16,8 +16,8 @@ repositories {
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
-    jvmTarget = "1.8"
-    languageVersion = "1.8"
+    jvmTarget = "17"
+    languageVersion = "1.9"
   }
 }
 
