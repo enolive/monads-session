@@ -4,7 +4,7 @@ val arrow_version: String by project
 val coroutines_version: String by project
 
 plugins {
-  kotlin("jvm") version "1.5.0"
+  kotlin("jvm") version "1.9.10"
 }
 
 group = "de.welcz"
@@ -16,7 +16,8 @@ repositories {
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "17"
+    languageVersion = "1.9"
   }
 }
 
@@ -25,6 +26,7 @@ dependencies {
   implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
   implementation("io.arrow-kt:arrow-core:$arrow_version")
 }
+
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
   freeCompilerArgs = listOf("-Xinline-classes")
