@@ -4,18 +4,18 @@ import arrow.core.raise.either
 import arrow.core.raise.ensure
 import arrow.core.right
 
-private sealed interface Expression
-private data class Const(val num: Int) : Expression
-private data class Div(val a: Expression, val b: Expression) : Expression
+sealed interface Expression
+data class Const(val num: Int) : Expression
+data class Div(val a: Expression, val b: Expression) : Expression
 
-private data object DivByZeroError
+data object DivByZeroError
 
-private val answer = Div(Div(Const(1932), Const(23)), Const(2))
-private val err = Div(Const(1), Const(0))
-private val complexErr = Div(answer, err)
+val answer = Div(Div(Const(1932), Const(23)), Const(2))
+val err = Div(Const(1), Const(0))
+val complexErr = Div(answer, err)
 
 // monadic comprehensions with the power of Arrow-Kt
-private fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
+fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
     is Const -> e.num.unit()
     is Div ->
         either {
@@ -38,12 +38,12 @@ private fun eval(e: Expression): Either<DivByZeroError, Int> = when (e) {
 // the only 3 languages I am aware of where something like this would be possible are Scala, C++ Templates and Haskell
 
 // unit :: (T) -> Monad<T>
-private fun <T> T.unit() = right()
+fun <T> T.unit() = right()
 
 // bind :: (Monad<T>, (T) -> Monad<U>) -> Monad<U>
-private fun <T, U, E> Either<E, T>.bind(f: (T) -> Either<E, U>) = flatMap(f)
+fun <T, U, E> Either<E, T>.bind(f: (T) -> Either<E, U>) = flatMap(f)
 
-private infix fun Int.safeDiv(that: Int) = either {
+infix fun Int.safeDiv(that: Int) = either {
     ensure(that != 0) { DivByZeroError }
     this@safeDiv / that
 }
