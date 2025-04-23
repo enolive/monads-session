@@ -1,10 +1,12 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val arrow_version: String by project
-val coroutines_version: String by project
+val arrowVersion: String by project
+val coroutinesVersion: String by project
 
 plugins {
-  kotlin("jvm") version "1.9.10"
+  kotlin("jvm") version "2.1.20"
 }
 
 group = "de.welcz"
@@ -15,19 +17,16 @@ repositories {
 }
 
 tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "17"
-    languageVersion = "1.9"
+  compilerOptions {
+    jvmTarget = JvmTarget.JVM_21
+    languageVersion = KotlinVersion.KOTLIN_2_1
+    freeCompilerArgs.addAll("-Xinline-classes")
   }
 }
 
 dependencies {
   implementation(kotlin("stdlib"))
-  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version")
-  implementation("io.arrow-kt:arrow-core:$arrow_version")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+  implementation("io.arrow-kt:arrow-core:$arrowVersion")
 }
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-  freeCompilerArgs = listOf("-Xinline-classes")
-}
